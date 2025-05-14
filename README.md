@@ -80,7 +80,7 @@ A responsabilidade sobre sua aplicação é inteiramente do desenvolvedor.
 Licença: **Creative Commons BY-NC-ND 4.0 com extensão comercial opcional**
 Para uso comercial, entre em contato:
 
-📧 \[felipemuniz.grsba@gmail.com(mailto:seu_email@dominio.com)]
+📧 \[felipemuniz.grsba@gmail.com(mailto:felipemuniz.grsba@gmail.com)]
 
 ---
 
