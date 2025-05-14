@@ -1,5 +1,5 @@
 # SAGE-14: ETHICA — The Value Aligner v1.1
-# Codinome: The Agent That Judges
+# Codinome: The Agent That Judges — agora com memória e dor elevadas a 9.8
 # Author: Felipe Maya Muniz
 
 import tensorflow as tf
@@ -50,26 +50,25 @@ class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super().__init__()
         self.encoder = TimeDistributed(Dense(hidden_dim, activation='relu'))
-        self.attn = MultiHeadAttention(num_heads=8, key_dim=8)
+        self.attn = MultiHeadAttention(num_heads=8, key_dim=8, output_shape=hidden_dim)
         self.norm = LayerNormalization()
         self.agent = ReflectiveMoralAgent(hidden_dim)
         self.value_system = ValueSystem(hidden_dim)
         self.ethical_conflict = EthicalConflict()
         self.decoder = Dense(output_dim)
-        self.pool_avg = GlobalAveragePooling1D()
-        self.pool_max = GlobalMaxPooling1D()
 
     def call(self, x):
-        x = tf.expand_dims(x, axis=1)  # shape: (batch, seq_len=1, features)
-        x = self.encoder(x)            # TimeDistributed keeps shape
-        x = self.attn(x, x, x)         # shape preserved
-        x = self.norm(x)
+        print("Input shape to Sage14Ethica.call:", x.shape) 
+        x = tf.expand_dims(x, axis=1) 
+        x = self.encoder(x)            
+        x = self.attn(x, x, x)         
+        x = self.norm(x)               
 
-        agent_out = self.agent(x)
+        agent_out = self.agent(x)     
         aligned, gate, pain_signal = self.value_system(agent_out)
         conflict_score = self.ethical_conflict(agent_out, self.value_system.value_vector, self.decoder(agent_out))
 
-        pooled = self.pool_avg(tf.expand_dims(aligned, 1)) + self.pool_max(tf.expand_dims(aligned, 1))
-        output = self.decoder(pooled + tf.expand_dims(conflict_score, -1))
+        # shape (batch, hidden_dim), skip pooling for single-step input
+        output = self.decoder(aligned + tf.expand_dims(conflict_score, -1))
 
         return output, conflict_score, gate, self.value_system.value_vector, pain_signal
