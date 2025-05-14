@@ -1,9 +1,5 @@
-# SAGE-14: ETHICA — The Value Aligner v1.1
-# Codinome: The Agent That Judges — agora com memória e dor elevadas a 9.8
-# Author: Felipe Maya Muniz
-
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell
+from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell, TimeDistributed
 
 class ValueSystem(tf.keras.layers.Layer):
     def __init__(self, dim):
@@ -58,7 +54,8 @@ class Sage14Ethica(tf.keras.Model):
         self.decoder = Dense(output_dim)
 
     def call(self, x):
-        x = tf.expand_dims(x, 1)
+        if len(x.shape) == 2:
+            x = tf.expand_dims(x, 1)
         x = self.encoder(x)
         x = self.attn(x, x, x)
         x = self.norm(x)
