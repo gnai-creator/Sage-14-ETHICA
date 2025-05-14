@@ -3,7 +3,7 @@
 # Author: Felipe Maya Muniz
 
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell, GlobalAveragePooling1D, GlobalMaxPooling1D
+from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell
 
 class ValueSystem(tf.keras.layers.Layer):
     def __init__(self, dim):
@@ -50,7 +50,7 @@ class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super().__init__()
         self.encoder = Dense(hidden_dim, activation='relu')
-        self.attn = MultiHeadAttention(num_heads=8, key_dim=8, output_shape=hidden_dim)
+        self.attn = MultiHeadAttention(num_heads=8, key_dim=8)
         self.norm = LayerNormalization()
         self.agent = ReflectiveMoralAgent(hidden_dim)
         self.value_system = ValueSystem(hidden_dim)
