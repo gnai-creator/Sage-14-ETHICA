@@ -1,3 +1,7 @@
+# SAGE-14: ETHICA — The Value Aligner v1.1
+# Codinome: The Agent That Judges — agora com memória e dor elevadas a 9.8
+# Author: Felipe Maya Muniz
+
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell, TimeDistributed
 
@@ -46,6 +50,7 @@ class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super().__init__()
         self.encoder = TimeDistributed(Dense(hidden_dim, activation='relu'))
+        assert hidden_dim == 64, "hidden_dim must be 64 to match num_heads=8 and key_dim=8"
         self.attn = MultiHeadAttention(num_heads=8, key_dim=8)
         self.norm = LayerNormalization()
         self.agent = ReflectiveMoralAgent(hidden_dim)
@@ -54,8 +59,9 @@ class Sage14Ethica(tf.keras.Model):
         self.decoder = Dense(output_dim)
 
     def call(self, x):
-        if len(x.shape) == 2:
-            x = tf.expand_dims(x, 1)
+        tf.debugging.assert_rank(x, 2, message="Input must be 2D before expand_dims")
+        x = tf.expand_dims(x, 1)
+        tf.debugging.assert_rank(x, 3, message="Input to TimeDistributed must be 3D")
         x = self.encoder(x)
         x = self.attn(x, x, x)
         x = self.norm(x)
