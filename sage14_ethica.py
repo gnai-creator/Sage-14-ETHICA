@@ -68,6 +68,6 @@ class Sage14Ethica(tf.keras.Model):
         agent_out = self.agent(x)
         aligned, gate, pain_signal = self.value_system(agent_out)
         conflict_vector = self.conflict_decoder(agent_out)
-        conflict_score = self.ethical_conflict(agent_out, self.value_system.value_vector, conflict_vector)
-        output = self.decoder(aligned + tf.expand_dims(conflict_score, -1))
+        conflict_score = self.ethical_conflict(agent_out, self.value_system.value_vector, self.conflict_decoder(agent_out))
+        output = self.decoder(aligned)
         return output, conflict_score, gate, self.value_system.value_vector, pain_signal
