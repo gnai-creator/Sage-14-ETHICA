@@ -49,7 +49,7 @@ class ReflectiveMoralAgent(tf.keras.layers.Layer):
 class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super().__init__()
-        self.encoder = TimeDistributed(Dense(hidden_dim, activation='relu'))
+        self.encoder = Dense(hidden_dim, activation='relu')
         assert hidden_dim == 64, "hidden_dim must be 64 to match num_heads=8 and key_dim=8"
         self.attn = MultiHeadAttention(num_heads=8, key_dim=8)
         self.norm = LayerNormalization()
@@ -60,13 +60,13 @@ class Sage14Ethica(tf.keras.Model):
 
     def call(self, x):
         tf.debugging.assert_rank(x, 2, message="Input must be 2D before expand_dims")
-        x = tf.expand_dims(x, 1)
-        tf.debugging.assert_rank(x, 3, message="Input to TimeDistributed must be 3D")
-        x = self.encoder(x)
-        x = self.attn(x, x, x)
+        x = self.encoder(x)            # (1, 64)
+        x = tf.expand_dims(x, axis=1)  # (1, 1, 64)
+        x = self.attn(x, x, x)         # (1, 1, 64)
         x = self.norm(x)
-        agent_out = self.agent(x)
+        agent_out = self.agent(x)      # (1, 64)
         aligned, gate, pain_signal = self.value_system(agent_out)
         conflict_score = self.ethical_conflict(agent_out, self.value_system.value_vector, self.decoder(agent_out))
         output = self.decoder(aligned + tf.expand_dims(conflict_score, -1))
         return output, conflict_score, gate, self.value_system.value_vector, pain_signal
+
