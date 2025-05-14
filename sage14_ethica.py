@@ -50,7 +50,9 @@ class ReflectiveMoralAgent(tf.keras.layers.Layer):
 class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super().__init__()
-        self.encoder = Dense(hidden_dim, activation='relu')
+        self.encoder = tf.keras.Sequential([
+            tf.keras.layers.TimeDistributed(Dense(hidden_dim, activation='relu'))
+        ])
         self.attn = MultiHeadAttention(num_heads=8, key_dim=8)
         self.norm = LayerNormalization()
         self.agent = ReflectiveMoralAgent(hidden_dim)
