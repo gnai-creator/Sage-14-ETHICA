@@ -61,6 +61,7 @@ class Sage14Ethica(tf.keras.Model):
         self.pool_max = GlobalMaxPooling1D()
 
     def call(self, x):
+        x = tf.expand_dims(x, axis=1)
         x = self.encoder(x)
         x = self.attn(x, x, x)
         x = self.norm(x)
