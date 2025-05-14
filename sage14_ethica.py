@@ -41,10 +41,11 @@ class ReflectiveMoralAgent(tf.keras.layers.Layer):
         self.reflect = Dense(dim, activation='relu')
 
     def call(self, x):
-        x = self.reflect(tf.reduce_mean(x, axis=1, keepdims=True))
+        x = self.reflect(tf.reduce_mean(x, axis=1))  # remove keepdims=True
         out, state = self.cell(x, [self.state])
         self.state.assign(state[0])
         return out
+
 
 class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
