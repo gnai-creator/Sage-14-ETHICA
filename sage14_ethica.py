@@ -3,7 +3,7 @@
 # Author: Felipe Maya Muniz
 
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell, TimeDistributed
+from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell
 
 class ValueSystem(tf.keras.layers.Layer):
     def __init__(self, dim):
@@ -59,14 +59,13 @@ class Sage14Ethica(tf.keras.Model):
         self.decoder = Dense(output_dim)
 
     def call(self, x):
-        tf.debugging.assert_rank(x, 2, message="Input must be 2D before expand_dims")
-        x = self.encoder(x)            # (1, 64)
-        x = tf.expand_dims(x, axis=1)  # (1, 1, 64)
-        x = self.attn(x, x, x)         # (1, 1, 64)
+        tf.debugging.assert_rank(x, 2, message="Input must be 2D")
+        x = self.encoder(x)
+        x = tf.expand_dims(x, axis=1)
+        x = self.attn(x, x, x)
         x = self.norm(x)
-        agent_out = self.agent(x)      # (1, 64)
+        agent_out = self.agent(x)
         aligned, gate, pain_signal = self.value_system(agent_out)
         conflict_score = self.ethical_conflict(agent_out, self.value_system.value_vector, self.decoder(agent_out))
         output = self.decoder(aligned + tf.expand_dims(conflict_score, -1))
         return output, conflict_score, gate, self.value_system.value_vector, pain_signal
-
