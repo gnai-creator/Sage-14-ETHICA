@@ -56,7 +56,7 @@ class Sage14Ethica(tf.keras.Model):
         self.agent = ReflectiveMoralAgent(hidden_dim)
         self.value_system = ValueSystem(hidden_dim)
         self.ethical_conflict = EthicalConflict()
-        self.decoder = Dense(output_dim)
+        self.decoder = Dense(hidden_dim)
 
     def call(self, x):
         tf.debugging.assert_rank(x, 2, message="Input must be 2D")
