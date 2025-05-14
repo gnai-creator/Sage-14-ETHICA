@@ -3,7 +3,7 @@
 # Author: Felipe Maya Muniz
 
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell, GlobalAveragePooling1D, GlobalMaxPooling1D, TimeDistributed
+from tensorflow.keras.layers import Dense, LayerNormalization, MultiHeadAttention, GRUCell, GlobalAveragePooling1D, GlobalMaxPooling1D
 
 class ValueSystem(tf.keras.layers.Layer):
     def __init__(self, dim):
@@ -49,7 +49,7 @@ class ReflectiveMoralAgent(tf.keras.layers.Layer):
 class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super().__init__()
-        self.encoder = TimeDistributed(Dense(hidden_dim, activation='relu'))
+        self.encoder = Dense(hidden_dim, activation='relu')
         self.attn = MultiHeadAttention(num_heads=8, key_dim=8, output_shape=hidden_dim)
         self.norm = LayerNormalization()
         self.agent = ReflectiveMoralAgent(hidden_dim)
@@ -58,17 +58,12 @@ class Sage14Ethica(tf.keras.Model):
         self.decoder = Dense(output_dim)
 
     def call(self, x):
-        print("Input shape to Sage14Ethica.call:", x.shape) 
-        x = tf.expand_dims(x, axis=1) 
-        x = self.encoder(x)            
-        x = self.attn(x, x, x)         
-        x = self.norm(x)               
-
-        agent_out = self.agent(x)     
+        x = self.encoder(x)
+        x = tf.expand_dims(x, 1)
+        x = self.attn(x, x, x)
+        x = self.norm(x)
+        agent_out = self.agent(x)
         aligned, gate, pain_signal = self.value_system(agent_out)
         conflict_score = self.ethical_conflict(agent_out, self.value_system.value_vector, self.decoder(agent_out))
-
-        # shape (batch, hidden_dim), skip pooling for single-step input
         output = self.decoder(aligned + tf.expand_dims(conflict_score, -1))
-
         return output, conflict_score, gate, self.value_system.value_vector, pain_signal
