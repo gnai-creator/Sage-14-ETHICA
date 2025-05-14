@@ -57,6 +57,7 @@ class Sage14Ethica(tf.keras.Model):
         self.value_system = ValueSystem(hidden_dim)
         self.ethical_conflict = EthicalConflict()
         self.decoder = Dense(hidden_dim)
+        self.conflict_decoder = Dense(hidden_dim)
 
     def call(self, x):
         tf.debugging.assert_rank(x, 2, message="Input must be 2D")
@@ -66,7 +67,7 @@ class Sage14Ethica(tf.keras.Model):
         x = self.norm(x)
         agent_out = self.agent(x)
         aligned, gate, pain_signal = self.value_system(agent_out)
-        decoded_out = self.decoder(agent_out)
+        decoded_out = self.conflict_decoder(agent_out)
         conflict_score = self.ethical_conflict(agent_out, self.value_system.value_vector, decoded_out)
         output = self.decoder(aligned + tf.expand_dims(conflict_score, -1))
         return output, conflict_score, gate, self.value_system.value_vector, pain_signal
