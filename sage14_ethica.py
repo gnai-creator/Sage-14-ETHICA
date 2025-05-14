@@ -49,7 +49,7 @@ class ReflectiveMoralAgent(tf.keras.layers.Layer):
 class Sage14Ethica(tf.keras.Model):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super().__init__()
-        self.encoder = Dense(hidden_dim, activation='relu')
+        self.encoder = TimeDistributed(Dense(hidden_dim, activation='relu'))
         self.attn = MultiHeadAttention(num_heads=8, key_dim=8)
         self.norm = LayerNormalization()
         self.agent = ReflectiveMoralAgent(hidden_dim)
@@ -58,8 +58,8 @@ class Sage14Ethica(tf.keras.Model):
         self.decoder = Dense(output_dim)
 
     def call(self, x):
-        x = self.encoder(x)
         x = tf.expand_dims(x, 1)
+        x = self.encoder(x)
         x = self.attn(x, x, x)
         x = self.norm(x)
         agent_out = self.agent(x)
