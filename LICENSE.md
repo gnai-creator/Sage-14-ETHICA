@@ -1,4 +1,4 @@
-Copyright (c) 2025 \[Seu Nome Aqui]
+Copyright (c) 2025 \ Felipe Maya Muniz
 
 Todos os direitos reservados.
 
@@ -35,7 +35,7 @@ O uso comercial do modelo (treinamento, fine-tuning, redistribuição, API, inte
 
 Entre em contato para licença:
 
-📧 \[[seu\_email@dominio.com](mailto:seu_email@dominio.com)]
+📧 \[[felipemuniz.grsba@gmail.com](mailto:felipemuniz.grsba@gmail.com)]
 
 ---
 
